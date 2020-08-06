@@ -1,3 +1,3 @@
-output "keycloak_ip" {
-  value = aws_instance.keycloak.public_ip
+output "keycloak_url" {
+  value = "https://${aws_instance.keycloak.public_ip}:8443"
 }
