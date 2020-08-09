@@ -1,6 +1,18 @@
 resource "aws_key_pair" "ssh-key" {
-  key_name_prefix = "keycloak"
+  key_name_prefix = "dex"
   public_key      = file("~/.ssh/id_rsa.pub")
+}
+
+resource "aws_route53_zone" "primary" {
+  name = "zone_name"
+}
+
+resource "aws_route53_record" "www" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "domain_name"
+  type    = "A"
+  ttl     = "300"
+  records = [aws_instance.keycloak.public_ip]
 }
 
 resource "aws_instance" "keycloak" {
@@ -19,8 +31,4 @@ resource "aws_instance" "keycloak" {
       host = self.public_ip
     }
   }
-
 }
-
-# TOKEN=$(http -f --verify=no POST 'https://localhost:8443/auth/realms/master/protocol/openid-connect/token' username=admin password=admin grant_type=password client_id=admin-cli | jq -r '.access_token')
-# http --verify=no POST 'https://localhost:8443/auth/admin/realms/master/clients' "Authorization: bearer $TOKEN"  id=kubernetes-cluster protocol=openid-connect

@@ -1,0 +1,64 @@
+issuer: http://dex:5556/dex
+storage:
+  type: sqlite3
+  config:
+    file: /dex.db
+web:
+   http: 0.0.0.0:5556
+  # https: 127.0.0.1:5556
+  # tlsCert: cert.pem
+  # tlsKey: key.pem
+  
+expiry:
+  signingKeys: "10m"
+  idTokens: "30m"
+
+logger:
+  level: "debug"
+  format: "json" 
+
+oauth2:
+  responseTypes: ["code", "token", "id_token"]
+  skipApprovalScreen: true
+
+
+connectors:
+  - type: gitlab
+    # Required field for connector id.
+    id: gitlab
+    # Required field for connector name.
+    name: GitLab
+    config:
+      # optional, default = https://gitlab.com
+      baseURL: https://gitlab.com
+      # Credentials can be string literals or pulled from the environment.
+      clientID: xxxxxxxx
+      clientSecret: xxxxxxxxxxx
+      redirectURI: http://127.0.0.1:5556/dex/callback
+      # Optional groups whitelist, communicated through the "groups" scope.
+      # If `groups` is omitted, all of the user's GitLab groups are returned when the groups scope is present.
+      # If `groups` is provided, this acts as a whitelist - only the user's GitLab groups that are in the configured `groups` below will go into the groups claim.  Conversely, if the user is not in any of the configured `groups`, the user will not be authenticated.
+      groups:
+      - gitlab_group_id
+      # flag which will switch from using the internal GitLab id to the users handle (@mention) as the user id.
+      # It is possible for a user to change their own user name but it is very rare for them to do so
+      useLoginAsID: false
+  - type: mockCallback
+    id: mock
+    name: Example
+
+enablePasswordDB: True
+
+staticClients:
+- id: example-cluster-client-id
+  name: Kubernetes Dev Cluster
+  secret: ZXhhbXBsZS1hcHAtc2VjcmV0 
+  redirectURIs:
+    - http://127.0.0.1:5555/callback/example-cluster
+
+staticPasswords:
+- email: "admin@example.com"
+  # bcrypt hash of the string "password"
+  hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+  username: "admin"
+  userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"  

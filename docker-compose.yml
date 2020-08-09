@@ -1,0 +1,18 @@
+version: '3'
+services:
+  dex:
+    build: ./dex
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dex/config:/dex-config
+  dex-k8s-authenticathor:
+    depends_on:
+      - dex
+    image:  mintel/dex-k8s-authenticator:latest
+    command:  --config /dex-k8s-authenticator/config/config.yaml
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./dex-k8s-authenticator/config:/dex-k8s-authenticator/config
+
